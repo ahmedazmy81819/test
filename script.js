@@ -37,15 +37,13 @@ document.getElementById('training-room').addEventListener('click', function () {
 
 // تغيير الوضع الداكن
 document.getElementById('dark-mode').addEventListener('click', function () {
-    document.body.style.backgroundColor = '#333';
-    document.body.style.color = '#fff';
+    document.body.classList.add('dark-mode');
     localStorage.setItem('theme', 'dark');
 });
 
 // تغيير الوضع الفاتح
 document.getElementById('light-mode').addEventListener('click', function () {
-    document.body.style.backgroundColor = '#f0f0f0';
-    document.body.style.color = '#000';
+    document.body.classList.remove('dark-mode');
     localStorage.setItem('theme', 'light');
 });
 
@@ -53,10 +51,8 @@ document.getElementById('light-mode').addEventListener('click', function () {
 window.addEventListener('load', function () {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
-        document.body.style.backgroundColor = '#333';
-        document.body.style.color = '#fff';
+        document.body.classList.add('dark-mode');
     } else {
-        document.body.style.backgroundColor = '#f0f0f0';
-        document.body.style.color = '#000';
+        document.body.classList.remove('dark-mode');
     }
 });
