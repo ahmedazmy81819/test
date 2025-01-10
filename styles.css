@@ -24,30 +24,55 @@ header {
     font-size: 1.5rem;
 }
 
-.buttons-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+#game-container {
+    position: relative;
+    width: 90%;
+    height: 70vh;
+    background-color: #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+}
+
+.word {
+    position: absolute;
+    font-size: 1.2rem;
+    color: #333;
+    transition: color 0.3s;
+    white-space: nowrap;
+    padding: 5px;
+    background-color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+#score, #level {
+    font-size: 1.2rem;
+    margin: 10px;
+}
+
+#input-container {
     margin-top: 20px;
 }
 
-button {
-    padding: 15px 30px;
+#user-input {
+    padding: 10px;
     font-size: 1.2rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: background-color 0.3s, transform 0.2s;
+    width: 80%;
+    max-width: 300px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    text-align: center;
 }
 
-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+#user-input:focus {
+    outline: none;
+    border-color: #0056b3;
 }
 
-.modal {
+#game-over-modal {
     display: none;
     position: fixed;
     z-index: 1;
@@ -58,7 +83,7 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
+#game-over-modal .modal-content {
     background-color: white;
     margin: 15% auto;
     padding: 20px;
@@ -69,14 +94,18 @@ button:hover {
     text-align: center;
 }
 
-.close {
-    color: #aaa;
-    float: left;
-    font-size: 28px;
-    font-weight: bold;
+#game-over-modal button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.close:hover {
-    color: black;
+#game-over-modal button:hover {
+    background-color: #0056b3;
 }
