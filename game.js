@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const finalScoreElement = document.getElementById('final-score');
     const retryButton = document.getElementById('retry');
     const goHomeButton = document.getElementById('go-home');
+    const shareButton = document.getElementById('share-button');
+    const scoreImage = document.getElementById('score-image');
+    const scoreText = document.getElementById('score-text');
+    const dateText = document.getElementById('date-text');
 
     let score = 0;
     let level = 1;
@@ -114,7 +118,28 @@ document.addEventListener('DOMContentLoaded', function () {
     function endGame() {
         gameOverModal.style.display = 'block';
         finalScoreElement.textContent = `النقاط النهائية: ${score}`;
+
+        // إظهار زر المشاركة إذا تجاوز المستوى 3 أو 4
+        if (level >= 3) {
+            shareButton.style.display = 'block';
+        }
     }
+
+    // وظيفة مشاركة الهاي سكور على الواتساب
+    shareButton.addEventListener('click', function () {
+        // تحديث النص في صورة الهاي سكور
+        scoreText.textContent = `النقاط: ${score}`;
+        dateText.textContent = `التاريخ: ${new Date().toLocaleString()}`;
+
+        // إنشاء صورة الهاي سكور
+        html2canvas(scoreImage).then(canvas => {
+            const image = canvas.toDataURL('image/png');
+
+            // فتح الواتساب مع الصورة
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent("هاي سكور جديد!")}`;
+            window.open(whatsappUrl, '_blank');
+        });
+    });
 
     userInput.addEventListener('keyup', function (event) {
         if (event.key === 'Enter') {
