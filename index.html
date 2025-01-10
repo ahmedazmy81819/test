@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة الكلمات المتساقطة</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>لعبة الكلمات المتساقطة</h1>
+    </header>
+    <main>
+        <div class="buttons-container">
+            <button id="start-game">بدء اللعبة</button>
+            <button id="resume-game">استئناف اللعبة</button>
+            <button id="settings">الإعدادات</button>
+        </div>
+    </main>
+
+    <!-- نافذة الإعدادات -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>الإعدادات</h2>
+            <label for="quality">جودة اللعبة:</label>
+            <select id="quality">
+                <option value="high">عالية</option>
+                <option value="medium">متوسطة</option>
+                <option value="low">منخفضة</option>
+            </select>
+            <label for="theme">وضع العرض:</label>
+            <select id="theme">
+                <option value="light">فاتح</option>
+                <option value="dark">داكن</option>
+            </select>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
