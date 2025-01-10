@@ -5,16 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة الكلمات المتساقطة</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* أنيميشن لفتح الصفحة */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        body {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .buttons-container button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .buttons-container button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+    </style>
 </head>
 <body>
     <header>
         <h1>لعبة الكلمات المتساقطة</h1>
     </header>
     <main>
-        <div class="buttons-container">
-            <button id="start-game">بدء اللعبة</button>
-            <button id="resume-game">استئناف اللعبة</button>
+        <div class="buttons-container" id="main-buttons">
+            <button id="start-game">ابدء اللعب</button>
             <button id="settings">الإعدادات</button>
+        </div>
+
+        <!-- الأزرار الجديدة التي تظهر بعد الضغط على "ابدء اللعب" -->
+        <div class="buttons-container" id="game-options" style="display: none;">
+            <button id="new-game">لعبة جديدة</button>
+            <button id="resume-game">استكمل اللعب</button>
+            <button id="training-room">غرفة التدريب</button>
         </div>
     </main>
 
@@ -23,17 +97,8 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>الإعدادات</h2>
-            <label for="quality">جودة اللعبة:</label>
-            <select id="quality">
-                <option value="high">عالية</option>
-                <option value="medium">متوسطة</option>
-                <option value="low">منخفضة</option>
-            </select>
-            <label for="theme">وضع العرض:</label>
-            <select id="theme">
-                <option value="light">فاتح</option>
-                <option value="dark">داكن</option>
-            </select>
+            <button id="dark-mode">الوضع الداكن</button>
+            <button id="light-mode">الوضع الفاتح</button>
         </div>
     </div>
 
