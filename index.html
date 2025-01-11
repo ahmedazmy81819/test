@@ -155,7 +155,7 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 1s;
+            transition: transform 2s ease-out;
         }
         .dice .face {
             position: absolute;
@@ -189,6 +189,15 @@
         }
         .dice-result.bad {
             background: #F44336;
+        }
+
+        /* قائمة الجوائز */
+        .prizes-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .prizes-list div {
+            margin-bottom: 10px;
         }
 
         /* الرسوم المتحركة */
@@ -290,6 +299,15 @@
             <div class="dice-result" id="diceResult"></div>
             <button onclick="rollDice()">رمي النرد</button>
             <button onclick="hideDice()">العودة للتاجر</button>
+            <div class="prizes-list">
+                <h3>قائمة الجوائز:</h3>
+                <div>1: قلبين إضافيين</div>
+                <div>2: 60 نقطة</div>
+                <div>3: خسارة كل النقاط</div>
+                <div>4: لا شيء</div>
+                <div>5: 100 نقطة</div>
+                <div>6: خسارة قلب واحد</div>
+            </div>
         </div>
     </div>
 
@@ -320,6 +338,16 @@
         const diceElement = document.getElementById('dice');
         const diceResultElement = document.getElementById('diceResult');
         const scoreElement = document.getElementById('score');
+
+        // قائمة الجوائز
+        const prizes = [
+            { type: "heart", value: 2, message: "لقد ربحت قلبين إضافيين!", color: "good" },
+            { type: "points", value: 60, message: "لقد ربحت 60 نقطة!", color: "good" },
+            { type: "losePoints", value: 0, message: "لقد خسرت كل النقاط!", color: "bad" },
+            { type: "nothing", value: 0, message: "لم تربح أي شيء!", color: "bad" },
+            { type: "points", value: 100, message: "لقد ربحت 100 نقطة!", color: "good" },
+            { type: "loseHeart", value: 1, message: "لقد خسرت قلبًا واحدًا!", color: "bad" }
+        ];
 
         // تحميل التقدم المحفوظ
         function loadProgress() {
@@ -563,26 +591,19 @@
             score -= 1;
             scoreElement.textContent = `النقاط: ${score}`;
 
-            // قائمة الجوائز
-            const prizes = [
-                { type: "heart", value: 2, message: "لقد ربحت قلبين إضافيين!", color: "good" },
-                { type: "points", value: 60, message: "لقد ربحت 60 نقطة!", color: "good" },
-                { type: "losePoints", value: 0, message: "لقد خسرت كل النقاط!", color: "bad" },
-                { type: "nothing", value: 0, message: "لم تربح أي شيء!", color: "bad" },
-                { type: "points", value: 100, message: "لقد ربحت 100 نقطة!", color: "good" },
-                { type: "loseHeart", value: 1, message: "لقد خسرت قلبًا واحدًا!", color: "bad" }
-            ];
-
-            // اختيار جائزة عشوائية
-            const randomIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[randomIndex];
-
             // تدوير النرد
             const dice = document.getElementById('dice');
-            dice.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) rotateZ(${Math.random() * 360}deg)`;
+            const randomRotationX = Math.floor(Math.random() * 360);
+            const randomRotationY = Math.floor(Math.random() * 360);
+            const randomRotationZ = Math.floor(Math.random() * 360);
+            dice.style.transform = `rotateX(${randomRotationX}deg) rotateY(${randomRotationY}deg) rotateZ(${randomRotationZ}deg)`;
 
-            // تطبيق الجائزة
+            // تحديد الوجه الظاهر
             setTimeout(() => {
+                const visibleFace = determineVisibleFace(randomRotationX, randomRotationY, randomRotationZ);
+                const prize = prizes[visibleFace - 1]; // لأن الأرقام من 1 إلى 6
+
+                // تطبيق الجائزة
                 switch (prize.type) {
                     case "heart":
                         hearts += prize.value;
@@ -607,7 +628,24 @@
                 // عرض نتيجة الجائزة
                 diceResultElement.textContent = prize.message;
                 diceResultElement.className = `dice-result ${prize.color}`;
-            }, 1000); // تأخير عرض النتيجة بعد انتهاء الدوران
+            }, 2000); // تأخير عرض النتيجة بعد انتهاء الدوران
+        }
+
+        // تحديد الوجه الظاهر
+        function determineVisibleFace(rotationX, rotationY, rotationZ) {
+            // تحويل الزوايا إلى نطاق 0-360
+            rotationX = rotationX % 360;
+            rotationY = rotationY % 360;
+            rotationZ = rotationZ % 360;
+
+            // تحديد الوجه الظاهر بناءً على الزوايا
+            if (rotationX < 45 || rotationX >= 315) return 1; // الوجه الأمامي
+            if (rotationX >= 45 && rotationX < 135) return 5; // الوجه العلوي
+            if (rotationX >= 135 && rotationX < 225) return 2; // الوجه الخلفي
+            if (rotationX >= 225 && rotationX < 315) return 6; // الوجه السفلي
+            if (rotationY >= 45 && rotationY < 135) return 3; // الوجه الأيمن
+            if (rotationY >= 135 && rotationY < 225) return 4; // الوجه الأيسر
+            return 1; // افتراضيًا الوجه الأمامي
         }
 
         // تحميل التقدم عند بدء اللعبة
