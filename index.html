@@ -277,7 +277,7 @@
                 <button onclick="buyHint()">شراء</button>
             </div>
             <div class="merchant-item">
-                <span>حجر النرد (1 نقطة)</span>
+                <span>حجر النرد (60 نقطة)</span>
                 <button onclick="showDice()">رمي النرد</button>
             </div>
             <button onclick="hideMerchant()">العودة للعبة</button>
@@ -313,7 +313,7 @@
 
     <script>
         const questions = [
-            { question: "ما هو الشيء الذي كلما أخذت منه كبر؟", answer: "الحفرة", options: ["الحفرة", "الشجرة", "النار", "الماء"], difficulty: "سهل" },
+ { question: "ما هو الشيء الذي كلما أخذت منه كبر؟", answer: "الحفرة", options: ["الحفرة", "الشجرة", "النار", "الماء"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يملك أسنانًا ولا يعض؟", answer: "المشط", options: ["المشط", "القط", "الكلب", "الأسد"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يسمع بلا أذن ويتكلم بلا لسان؟", answer: "الهاتف", options: ["الهاتف", "الراديو", "التلفزيون", "المذياع"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يدور حول البيت دون أن يتحرك؟", answer: "الجدار", options: ["الجدار", "الباب", "النافذة", "السقف"], difficulty: "سهل" },
@@ -411,7 +411,6 @@
             { question: "ما هو الشيء الذي له أوراق وليس بنبات؟", answer: "الكتاب", options: ["الكتاب", "الشجرة", "الورقة", "الدفتر"], difficulty: "صعب" },
             { question: "ما هو الشيء الذي له بحر بلا ماء؟", answer: "الخريطة", options: ["الخريطة", "البحر", "النهر", "المحيط"], difficulty: "صعب" },
         ];
-
         let currentQuestionIndex = 0;
         let hearts = 5;
         let hintCount = 3;
@@ -618,9 +617,15 @@
             score = 0;
             startScreen.style.display = 'none';
             gameScreen.style.display = 'block';
-            loadQuestion();
+            loadRandomQuestion();
             updateHearts();
             scoreElement.textContent = `النقاط: ${score}`;
+        }
+
+        // تحميل سؤال عشوائي
+        function loadRandomQuestion() {
+            currentQuestionIndex = Math.floor(Math.random() * questions.length);
+            loadQuestion();
         }
 
         // إعادة اللعبة
@@ -685,7 +690,7 @@
 
         // عرض شاشة حجر النرد
         function showDice() {
-            if (score >= 1) {
+            if (score >= 60) {
                 merchantScreen.style.display = 'none';
                 diceScreen.style.display = 'block';
             } else {
@@ -701,13 +706,13 @@
 
         // رمي النرد
         function rollDice() {
-            if (score < 1) {
+            if (score < 60) {
                 alert("ليس لديك نقاط كافية!");
                 return;
             }
 
-            // خصم نقطة واحدة
-            score -= 1;
+            // خصم 60 نقطة
+            score -= 60;
             scoreElement.textContent = `النقاط: ${score}`;
 
             // تدوير النرد
