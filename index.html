@@ -138,10 +138,15 @@
         .merchant-item button:hover {
             background: #ff7f00;
         }
+
+        /* تصميم عجلة الحظ الجديدة */
+        .wheel-screen {
+            text-align: center;
+        }
         .wheel-container {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             margin: 20px auto;
         }
         .wheel {
@@ -158,6 +163,15 @@
             );
             position: relative;
             animation: spin 5s linear infinite;
+        }
+        .wheel-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
         }
         .wheel-pointer {
             width: 0;
@@ -267,11 +281,18 @@
             <button onclick="hideMerchant()">العودة للعبة</button>
         </div>
 
-        <!-- شاشة عجلة الحظ -->
+        <!-- شاشة عجلة الحظ الجديدة -->
         <div class="wheel-screen" id="wheelScreen">
             <h2>عجلة الحظ</h2>
             <div class="wheel-container">
-                <div class="wheel" id="wheel"></div>
+                <div class="wheel" id="wheel">
+                    <div class="wheel-text">قلبين</div>
+                    <div class="wheel-text">60 نقطة</div>
+                    <div class="wheel-text">خسارة النقاط</div>
+                    <div class="wheel-text">لا شيء</div>
+                    <div class="wheel-text">100 نقطة</div>
+                    <div class="wheel-text">خسارة قلب</div>
+                </div>
                 <div class="wheel-pointer"></div>
             </div>
             <div class="wheel-result" id="wheelResult"></div>
@@ -525,7 +546,7 @@
 
         // عرض شاشة عجلة الحظ
         function showWheel() {
-            if (score >= 1) { // تغيير الشرط إلى 1 نقطة
+            if (score >= 1) {
                 merchantScreen.style.display = 'none';
                 wheelScreen.style.display = 'block';
             } else {
@@ -541,16 +562,16 @@
 
         // تدوير عجلة الحظ
         function spinWheel() {
-            if (score < 1) { // تغيير الشرط إلى 1 نقطة
+            if (score < 1) {
                 alert("ليس لديك نقاط كافية!");
                 return;
             }
 
-            // خصم 1 نقطة بدلًا من 60
+            // خصم نقطة واحدة
             score -= 1;
             scoreElement.textContent = `النقاط: ${score}`;
 
-            // بقية الكود كما هو...
+            // قائمة الجوائز
             const prizes = [
                 { type: "heart", value: 2, message: "لقد ربحت قلبين إضافيين!", color: "good" },
                 { type: "points", value: 60, message: "لقد ربحت 60 نقطة!", color: "good" },
@@ -560,6 +581,7 @@
                 { type: "loseHeart", value: 1, message: "لقد خسرت قلبًا واحدًا!", color: "bad" }
             ];
 
+            // اختيار جائزة عشوائية
             const randomIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[randomIndex];
 
