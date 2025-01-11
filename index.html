@@ -112,12 +112,12 @@
         .options button {
             width: 100%;
         }
-        .lose-screen, .win-screen, .start-screen, .merchant-screen, .wheel-screen {
+        .lose-screen, .win-screen, .start-screen, .merchant-screen, .dice-screen {
             display: none;
             margin-top: 20px;
             animation: fadeIn 1s ease-in-out;
         }
-        .lose-screen h2, .win-screen h2, .start-screen h2, .merchant-screen h2, .wheel-screen h2 {
+        .lose-screen h2, .win-screen h2, .start-screen h2, .merchant-screen h2, .dice-screen h2 {
             font-size: 2rem;
             margin-bottom: 20px;
         }
@@ -139,62 +139,55 @@
             background: #ff7f00;
         }
 
-        /* تصميم عجلة الحظ الجديدة */
-        .wheel-screen {
+        /* تصميم النرد */
+        .dice-screen {
             text-align: center;
         }
-        .wheel-container {
+        .dice-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 100px;
+            height: 100px;
             margin: 20px auto;
+            perspective: 1000px;
         }
-        .wheel {
+        .dice {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                #4CAF50 0deg 60deg,
-                #FFC107 60deg 120deg,
-                #F44336 120deg 180deg,
-                #9E9E9E 180deg 240deg,
-                #2196F3 240deg 300deg,
-                #FF5722 300deg 360deg
-            );
             position: relative;
-            animation: spin 5s linear infinite;
+            transform-style: preserve-3d;
+            transition: transform 1s;
         }
-        .wheel-text {
+        .dice .face {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.2rem;
-            color: white;
-            text-align: center;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: #333;
         }
-        .wheel-pointer {
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 20px solid #fff;
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .wheel-result {
+        .dice .face.front { transform: translateZ(50px); }
+        .dice .face.back { transform: rotateY(180deg) translateZ(50px); }
+        .dice .face.right { transform: rotateY(90deg) translateZ(50px); }
+        .dice .face.left { transform: rotateY(-90deg) translateZ(50px); }
+        .dice .face.top { transform: rotateX(90deg) translateZ(50px); }
+        .dice .face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+        .dice-result {
             margin-top: 20px;
             font-size: 1.2rem;
             padding: 10px;
             border-radius: 10px;
             animation: fadeIn 0.5s ease-in-out;
         }
-        .wheel-result.good {
+        .dice-result.good {
             background: #4CAF50;
         }
-        .wheel-result.bad {
+        .dice-result.bad {
             background: #F44336;
         }
 
@@ -275,30 +268,30 @@
                 <button onclick="buyHint()">شراء</button>
             </div>
             <div class="merchant-item">
-                <span>عجلة الحظ (1 نقطة)</span>
-                <button onclick="showWheel()">دوران</button>
+                <span>حجر النرد (1 نقطة)</span>
+                <button onclick="showDice()">رمي النرد</button>
             </div>
             <button onclick="hideMerchant()">العودة للعبة</button>
         </div>
 
-       <!-- شاشة عجلة الحظ الجديدة -->
-<div class="wheel-screen" id="wheelScreen">
-    <h2>عجلة الحظ</h2>
-    <div class="wheel-container">
-        <div class="wheel" id="wheel">
-            <div class="wheel-text" style="transform: rotate(30deg) translate(100px) rotate(-30deg);">قلبين</div>
-            <div class="wheel-text" style="transform: rotate(90deg) translate(100px) rotate(-90deg);">60 نقطة</div>
-            <div class="wheel-text" style="transform: rotate(150deg) translate(100px) rotate(-150deg);">خسارة النقاط</div>
-            <div class="wheel-text" style="transform: rotate(210deg) translate(100px) rotate(-210deg);">لا شيء</div>
-            <div class="wheel-text" style="transform: rotate(270deg) translate(100px) rotate(-270deg);">100 نقطة</div>
-            <div class="wheel-text" style="transform: rotate(330deg) translate(100px) rotate(-330deg);">خسارة قلب</div>
+        <!-- شاشة حجر النرد -->
+        <div class="dice-screen" id="diceScreen">
+            <h2>حجر النرد</h2>
+            <div class="dice-container">
+                <div class="dice" id="dice">
+                    <div class="face front">1</div>
+                    <div class="face back">2</div>
+                    <div class="face right">3</div>
+                    <div class="face left">4</div>
+                    <div class="face top">5</div>
+                    <div class="face bottom">6</div>
+                </div>
+            </div>
+            <div class="dice-result" id="diceResult"></div>
+            <button onclick="rollDice()">رمي النرد</button>
+            <button onclick="hideDice()">العودة للتاجر</button>
         </div>
-        <div class="wheel-pointer"></div>
     </div>
-    <div class="wheel-result" id="wheelResult"></div>
-    <button onclick="spinWheel()">دوران</button>
-    <button onclick="hideWheel()">العودة للتاجر</button>
-</div>
 
     <script>
         const questions = [
@@ -323,9 +316,9 @@
         const startScreen = document.getElementById('startScreen');
         const gameScreen = document.getElementById('gameScreen');
         const merchantScreen = document.getElementById('merchantScreen');
-        const wheelScreen = document.getElementById('wheelScreen');
-        const wheelElement = document.getElementById('wheel');
-        const wheelResultElement = document.getElementById('wheelResult');
+        const diceScreen = document.getElementById('diceScreen');
+        const diceElement = document.getElementById('dice');
+        const diceResultElement = document.getElementById('diceResult');
         const scoreElement = document.getElementById('score');
 
         // تحميل التقدم المحفوظ
@@ -543,24 +536,24 @@
             }
         }
 
-        // عرض شاشة عجلة الحظ
-        function showWheel() {
+        // عرض شاشة حجر النرد
+        function showDice() {
             if (score >= 1) {
                 merchantScreen.style.display = 'none';
-                wheelScreen.style.display = 'block';
+                diceScreen.style.display = 'block';
             } else {
                 alert("ليس لديك نقاط كافية!");
             }
         }
 
-        // إخفاء شاشة عجلة الحظ
-        function hideWheel() {
-            wheelScreen.style.display = 'none';
+        // إخفاء شاشة حجر النرد
+        function hideDice() {
+            diceScreen.style.display = 'none';
             merchantScreen.style.display = 'block';
         }
 
-        // تدوير عجلة الحظ
-        function spinWheel() {
+        // رمي النرد
+        function rollDice() {
             if (score < 1) {
                 alert("ليس لديك نقاط كافية!");
                 return;
@@ -584,31 +577,37 @@
             const randomIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[randomIndex];
 
-            // تطبيق الجائزة
-            switch (prize.type) {
-                case "heart":
-                    hearts += prize.value;
-                    updateHearts();
-                    break;
-                case "points":
-                    score += prize.value;
-                    scoreElement.textContent = `النقاط: ${score}`;
-                    break;
-                case "losePoints":
-                    score = 0;
-                    scoreElement.textContent = `النقاط: ${score}`;
-                    break;
-                case "loseHeart":
-                    hearts -= prize.value;
-                    updateHearts();
-                    break;
-                default:
-                    break;
-            }
+            // تدوير النرد
+            const dice = document.getElementById('dice');
+            dice.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) rotateZ(${Math.random() * 360}deg)`;
 
-            // عرض نتيجة الجائزة
-            wheelResultElement.textContent = prize.message;
-            wheelResultElement.className = `wheel-result ${prize.color}`;
+            // تطبيق الجائزة
+            setTimeout(() => {
+                switch (prize.type) {
+                    case "heart":
+                        hearts += prize.value;
+                        updateHearts();
+                        break;
+                    case "points":
+                        score += prize.value;
+                        scoreElement.textContent = `النقاط: ${score}`;
+                        break;
+                    case "losePoints":
+                        score = 0;
+                        scoreElement.textContent = `النقاط: ${score}`;
+                        break;
+                    case "loseHeart":
+                        hearts -= prize.value;
+                        updateHearts();
+                        break;
+                    default:
+                        break;
+                }
+
+                // عرض نتيجة الجائزة
+                diceResultElement.textContent = prize.message;
+                diceResultElement.className = `dice-result ${prize.color}`;
+            }, 1000); // تأخير عرض النتيجة بعد انتهاء الدوران
         }
 
         // تحميل التقدم عند بدء اللعبة
