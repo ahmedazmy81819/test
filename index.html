@@ -312,8 +312,7 @@
     </div>
 
     <script>
-        const questions = [
- { question: "ما هو الشيء الذي كلما أخذت منه كبر؟", answer: "الحفرة", options: ["الحفرة", "الشجرة", "النار", "الماء"], difficulty: "سهل" },
+        { question: "ما هو الشيء الذي كلما أخذت منه كبر؟", answer: "الحفرة", options: ["الحفرة", "الشجرة", "النار", "الماء"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يملك أسنانًا ولا يعض؟", answer: "المشط", options: ["المشط", "القط", "الكلب", "الأسد"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يسمع بلا أذن ويتكلم بلا لسان؟", answer: "الهاتف", options: ["الهاتف", "الراديو", "التلفزيون", "المذياع"], difficulty: "سهل" },
             { question: "ما هو الشيء الذي يدور حول البيت دون أن يتحرك؟", answer: "الجدار", options: ["الجدار", "الباب", "النافذة", "السقف"], difficulty: "سهل" },
@@ -411,6 +410,7 @@
             { question: "ما هو الشيء الذي له أوراق وليس بنبات؟", answer: "الكتاب", options: ["الكتاب", "الشجرة", "الورقة", "الدفتر"], difficulty: "صعب" },
             { question: "ما هو الشيء الذي له بحر بلا ماء؟", answer: "الخريطة", options: ["الخريطة", "البحر", "النهر", "المحيط"], difficulty: "صعب" },
         ];
+
         let currentQuestionIndex = 0;
         let hearts = 5;
         let hintCount = 3;
@@ -475,6 +475,13 @@
                 hearts = savedProgress.hearts;
                 hintCount = savedProgress.hintCount;
                 score = savedProgress.score;
+                updateHearts();
+                scoreElement.textContent = `النقاط: ${score}`;
+                hintButton.textContent = `عرض الاختيارات (${hintCount})`;
+                if (hintCount === 0) {
+                    hintButton.disabled = true;
+                }
+                loadQuestion();
             }
         }
 
@@ -502,7 +509,22 @@
             if (hearts === 0) {
                 loseScreen.style.display = 'block';
                 gameScreen.style.display = 'none';
+                resetGame(); // إعادة تعيين اللعبة عند فقدان جميع القلوب
             }
+        }
+
+        // إعادة تعيين اللعبة
+        function resetGame() {
+            currentQuestionIndex = 0;
+            hearts = 5;
+            hintCount = 3;
+            score = 0;
+            localStorage.removeItem('gameProgress'); // حذف التقدم المحفوظ
+            updateHearts();
+            scoreElement.textContent = `النقاط: ${score}`;
+            hintButton.textContent = `عرض الاختيارات (${hintCount})`;
+            hintButton.disabled = false;
+            loadQuestion();
         }
 
         // تحميل السؤال الحالي
@@ -557,6 +579,7 @@
             } else {
                 loadQuestion();
             }
+            saveProgress();
         }
 
         // عرض الاختيارات كأزرار
@@ -669,6 +692,7 @@
                 scoreElement.textContent = `النقاط: ${score}`;
                 updateHearts();
                 alert("لقد اشتريت قلبًا إضافيًا!");
+                saveProgress();
             } else {
                 alert("ليس لديك نقاط كافية!");
             }
@@ -683,6 +707,7 @@
                 hintButton.textContent = `عرض الاختيارات (${hintCount})`;
                 hintButton.disabled = false;
                 alert("لقد اشتريت زيادة في عدد مرات استخدام زر الاختيارات!");
+                saveProgress();
             } else {
                 alert("ليس لديك نقاط كافية!");
             }
@@ -752,6 +777,7 @@
                 // عرض نتيجة الجائزة
                 diceResultElement.textContent = prize.message;
                 diceResultElement.className = `dice-result ${prize.color}`;
+                saveProgress();
             }, 2000); // تأخير عرض النتيجة بعد انتهاء الدوران
         }
 
