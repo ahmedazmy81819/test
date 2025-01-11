@@ -3,27 +3,601 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Battle</title>
+    <title>لعبة الألغاز</title>
     <style>
+        /* التصميم العام */
         body {
-            margin: 0;
-            overflow: hidden;
-            background-color: black;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
-            font-family: Arial, sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
-        canvas {
-            display: block;
-            margin: 0 auto;
-            background-color: black;
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: slideIn 1s ease-in-out;
+        }
+        .hearts {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: #ff4757;
+            display: flex;
+            gap: 10px;
+            animation: slideIn 1s ease-in-out;
+        }
+        .heart {
+            transition: all 0.3s ease;
+        }
+        .heart.lost {
+            animation: heartLost 0.5s ease-in-out forwards;
+        }
+        .question {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .difficulty {
+            font-size: 1rem;
+            color: #ffdd59;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.05);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #25d366;
+            color: white;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        button:hover {
+            background: #128C7E;
+            transform: scale(1.05);
+        }
+        button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+        #hintButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ff9f43;
+        }
+        #hintButton:hover {
+            background: #ff7f00;
+        }
+        .options {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .options button {
+            width: 100%;
+        }
+        .lose-screen, .win-screen, .start-screen, .merchant-screen, .wheel-screen {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .lose-screen h2, .win-screen h2, .start-screen h2, .merchant-screen h2, .wheel-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .score {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .merchant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #fff;
+        }
+        .merchant-item button {
+            background: #ff9f43;
+        }
+        .merchant-item button:hover {
+            background: #ff7f00;
+        }
+        .wheel-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #4CAF50 0deg 60deg,
+                #FFC107 60deg 120deg,
+                #F44336 120deg 180deg,
+                #9E9E9E 180deg 240deg,
+                #2196F3 240deg 300deg,
+                #FF5722 300deg 360deg
+            );
+            position: relative;
+            animation: spin 5s linear infinite;
+        }
+        .wheel-pointer {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #fff;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .wheel-result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .wheel-result.good {
+            background: #4CAF50;
+        }
+        .wheel-result.bad {
+            background: #F44336;
+        }
+
+        /* الرسوم المتحركة */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes heartLost {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>Space Battle</h1>
-    <p>استخدم مفاتيح الأسهم للتحرك وتفادي الأعداء!</p>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <script src="game.js"></script>
+    <div class="container">
+        <!-- شاشة البداية -->
+        <div class="start-screen" id="startScreen">
+            <h1>لعبة الألغاز</h1>
+            <button onclick="startGame()">ابدأ اللعبة</button>
+            <button onclick="showInstructions()">تعليمات</button>
+        </div>
+
+        <!-- واجهة اللعبة -->
+        <div id="gameScreen" style="display: none;">
+            <h1>لعبة الألغاز</h1>
+            <div class="hearts" id="hearts">
+                <div class="heart">❤️</div>
+                <div class="heart">❤️</div>
+                <div class="heart">❤️</div>
+                <div class="heart">❤️</div>
+                <div class="heart">❤️</div>
+            </div>
+            <button id="hintButton" onclick="showOptions()">عرض الاختيارات (3)</button>
+            <button onclick="showMerchant()">التاجر</button>
+            <div class="difficulty" id="difficulty"></div>
+            <div class="question" id="question"></div>
+            <input type="text" id="answer" placeholder="أدخل إجابتك هنا">
+            <button id="submitButton" onclick="checkAnswer()" disabled>تحقق</button>
+            <button onclick="retryQuestion()">إعادة المحاولة</button>
+            <button onclick="goToHome()">العودة للصفحة الرئيسية</button>
+            <div class="options" id="options"></div>
+            <div class="score" id="score">النقاط: 0</div>
+        </div>
+
+        <!-- شاشة الخسارة -->
+        <div class="lose-screen" id="loseScreen">
+            <h2>عيد يا فالح!</h2>
+            <button onclick="restartGame()">إعادة اللعبة</button>
+            <button onclick="goToHome()">العودة للصفحة الرئيسية</button>
+        </div>
+
+        <!-- شاشة الفوز -->
+        <div class="win-screen" id="winScreen">
+            <h2>أحسنت! لقد فزت!</h2>
+            <button onclick="restartGame()">إعادة اللعبة</button>
+            <button onclick="goToHome()">العودة للصفحة الرئيسية</button>
+        </div>
+
+        <!-- شاشة التاجر -->
+        <div class="merchant-screen" id="merchantScreen">
+            <h2>التاجر</h2>
+            <div class="merchant-item">
+                <span>قلب إضافي (50 نقطة)</span>
+                <button onclick="buyHeart()">شراء</button>
+            </div>
+            <div class="merchant-item">
+                <span>زيادة عدد مرات استخدام زر الاختيارات (30 نقطة)</span>
+                <button onclick="buyHint()">شراء</button>
+            </div>
+            <div class="merchant-item">
+                <span>عجلة الحظ (1 نقطة)</span>
+                <button onclick="showWheel()">دوران</button>
+            </div>
+            <button onclick="hideMerchant()">العودة للعبة</button>
+        </div>
+
+        <!-- شاشة عجلة الحظ -->
+        <div class="wheel-screen" id="wheelScreen">
+            <h2>عجلة الحظ</h2>
+            <div class="wheel-container">
+                <div class="wheel" id="wheel"></div>
+                <div class="wheel-pointer"></div>
+            </div>
+            <div class="wheel-result" id="wheelResult"></div>
+            <button onclick="spinWheel()">دوران</button>
+            <button onclick="hideWheel()">العودة للتاجر</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "ما هو الشيء الذي كلما أخذت منه كبر؟", answer: "الحفرة", options: ["الحفرة", "الشجرة", "النار", "الماء"], difficulty: "سهل" },
+            { question: "ما هو الشيء الذي يمشي بلا رجلين ويبكي بلا عينين؟", answer: "السحاب", options: ["السحاب", "النهر", "الريح", "الطائر"], difficulty: "متوسط" },
+            { question: "ما هو الشيء الذي لديه أوراق وليس نباتًا؟", answer: "الكتاب", options: ["الكتاب", "الشجرة", "الصحيفة", "الزهرة"], difficulty: "صعب" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let hearts = 5;
+        let hintCount = 3;
+        let score = 0;
+        const heartsElement = document.getElementById('hearts');
+        const questionElement = document.getElementById('question');
+        const difficultyElement = document.getElementById('difficulty');
+        const answerInput = document.getElementById('answer');
+        const submitButton = document.getElementById('submitButton');
+        const hintButton = document.getElementById('hintButton');
+        const optionsElement = document.getElementById('options');
+        const loseScreen = document.getElementById('loseScreen');
+        const winScreen = document.getElementById('winScreen');
+        const startScreen = document.getElementById('startScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const merchantScreen = document.getElementById('merchantScreen');
+        const wheelScreen = document.getElementById('wheelScreen');
+        const wheelElement = document.getElementById('wheel');
+        const wheelResultElement = document.getElementById('wheelResult');
+        const scoreElement = document.getElementById('score');
+
+        // تحميل التقدم المحفوظ
+        function loadProgress() {
+            const savedProgress = JSON.parse(localStorage.getItem('gameProgress'));
+            if (savedProgress) {
+                currentQuestionIndex = savedProgress.currentQuestionIndex;
+                hearts = savedProgress.hearts;
+                hintCount = savedProgress.hintCount;
+                score = savedProgress.score;
+            }
+        }
+
+        // حفظ التقدم
+        function saveProgress() {
+            const progress = {
+                currentQuestionIndex,
+                hearts,
+                hintCount,
+                score
+            };
+            localStorage.setItem('gameProgress', JSON.stringify(progress));
+        }
+
+        // تحديث القلوب مع تأثيرات
+        function updateHearts() {
+            const heartElements = heartsElement.querySelectorAll('.heart');
+            heartElements.forEach((heart, index) => {
+                if (index >= hearts) {
+                    heart.classList.add('lost');
+                } else {
+                    heart.classList.remove('lost');
+                }
+            });
+            if (hearts === 0) {
+                loseScreen.style.display = 'block';
+                gameScreen.style.display = 'none';
+            }
+        }
+
+        // تحميل السؤال الحالي
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            difficultyElement.textContent = `صعوبة الفزورة: ${currentQuestion.difficulty}`;
+            answerInput.value = '';
+            optionsElement.style.display = 'none'; // إخفاء الخيارات عند تحميل سؤال جديد
+        }
+
+        // جعل الكود غير حساس للحروف المتشابهة
+        function normalizeArabicText(text) {
+            return text
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/[ى]/g, 'ي')
+                .replace(/[ة]/g, 'ه')
+                .replace(/[ؤ]/g, 'و')
+                .replace(/\s+/g, ' ') // إزالة المسافات الزائدة
+                .trim(); // إزالة المسافات من البداية والنهاية
+        }
+
+        // التحقق من الإجابة
+        function checkAnswer() {
+            const userAnswer = normalizeArabicText(answerInput.value.trim().toLowerCase());
+            const correctAnswer = normalizeArabicText(questions[currentQuestionIndex].answer.toLowerCase());
+
+            if (userAnswer === correctAnswer) {
+                alert("إجابة صحيحة!");
+                score += 10;
+                scoreElement.textContent = `النقاط: ${score}`;
+                nextQuestion();
+            } else {
+                const distance = levenshteinDistance(userAnswer, correctAnswer);
+                if (distance <= 2) { // إذا كانت المسافة بين الكلمتين 2 أو أقل
+                    alert("قربت من الإجابة الصحيحة!");
+                } else {
+                    hearts--;
+                    updateHearts();
+                    alert("إجابة خاطئة!");
+                }
+            }
+            saveProgress();
+        }
+
+        // الانتقال للسؤال التالي
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= questions.length) {
+                winScreen.style.display = 'block';
+                gameScreen.style.display = 'none';
+            } else {
+                loadQuestion();
+            }
+        }
+
+        // عرض الاختيارات كأزرار
+        function showOptions() {
+            if (hintCount > 0) {
+                const currentQuestion = questions[currentQuestionIndex];
+                const shuffledOptions = shuffleArray([...currentQuestion.options]);
+                optionsElement.innerHTML = '';
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.onclick = () => {
+                        const normalizedOption = normalizeArabicText(option.toLowerCase());
+                        const correctAnswer = normalizeArabicText(currentQuestion.answer.toLowerCase());
+                        if (normalizedOption === correctAnswer) {
+                            alert("إجابة صحيحة!");
+                            score += 10;
+                            scoreElement.textContent = `النقاط: ${score}`;
+                            nextQuestion();
+                        } else {
+                            hearts--;
+                            updateHearts();
+                            alert("إجابة خاطئة!");
+                        }
+                        optionsElement.style.display = 'none';
+                    };
+                    optionsElement.appendChild(button);
+                });
+                optionsElement.style.display = 'flex';
+                hintCount--;
+                hintButton.textContent = `عرض الاختيارات (${hintCount})`;
+                if (hintCount === 0) {
+                    hintButton.disabled = true;
+                }
+                saveProgress();
+            }
+        }
+
+        // إعادة المحاولة
+        function retryQuestion() {
+            answerInput.value = '';
+            optionsElement.style.display = 'none';
+        }
+
+        // العودة للصفحة الرئيسية
+        function goToHome() {
+            startScreen.style.display = 'block';
+            gameScreen.style.display = 'none';
+            loseScreen.style.display = 'none';
+            winScreen.style.display = 'none';
+        }
+
+        // بدء اللعبة
+        function startGame() {
+            currentQuestionIndex = 0;
+            hearts = 5;
+            hintCount = 3;
+            score = 0;
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            loadQuestion();
+            updateHearts();
+            scoreElement.textContent = `النقاط: ${score}`;
+        }
+
+        // إعادة اللعبة
+        function restartGame() {
+            loseScreen.style.display = 'none';
+            winScreen.style.display = 'none';
+            startGame();
+        }
+
+        // عرض التعليمات
+        function showInstructions() {
+            alert("تعليمات اللعبة:\n1. اقرأ السؤال وأدخل الإجابة.\n2. لديك 5 قلوب، تفقد واحدًا عند الإجابة الخاطئة.\n3. يمكنك استخدام زر الاختيارات 3 مرات فقط.\n4. حاول تحقيق أعلى النقاط!");
+        }
+
+        // ترتيب عشوائي للمصفوفة
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // عرض شاشة التاجر
+        function showMerchant() {
+            gameScreen.style.display = 'none';
+            merchantScreen.style.display = 'block';
+        }
+
+        // إخفاء شاشة التاجر
+        function hideMerchant() {
+            merchantScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+        }
+
+        // شراء قلب إضافي
+        function buyHeart() {
+            if (score >= 50) {
+                hearts++;
+                score -= 50;
+                scoreElement.textContent = `النقاط: ${score}`;
+                updateHearts();
+                alert("لقد اشتريت قلبًا إضافيًا!");
+            } else {
+                alert("ليس لديك نقاط كافية!");
+            }
+        }
+
+        // شراء زيادة عدد مرات استخدام زر الاختيارات
+        function buyHint() {
+            if (score >= 30) {
+                hintCount++;
+                score -= 30;
+                scoreElement.textContent = `النقاط: ${score}`;
+                hintButton.textContent = `عرض الاختيارات (${hintCount})`;
+                hintButton.disabled = false;
+                alert("لقد اشتريت زيادة في عدد مرات استخدام زر الاختيارات!");
+            } else {
+                alert("ليس لديك نقاط كافية!");
+            }
+        }
+
+        // عرض شاشة عجلة الحظ
+        function showWheel() {
+            if (score >= 1) { // تغيير الشرط إلى 1 نقطة
+                merchantScreen.style.display = 'none';
+                wheelScreen.style.display = 'block';
+            } else {
+                alert("ليس لديك نقاط كافية!");
+            }
+        }
+
+        // إخفاء شاشة عجلة الحظ
+        function hideWheel() {
+            wheelScreen.style.display = 'none';
+            merchantScreen.style.display = 'block';
+        }
+
+        // تدوير عجلة الحظ
+        function spinWheel() {
+            if (score < 1) { // تغيير الشرط إلى 1 نقطة
+                alert("ليس لديك نقاط كافية!");
+                return;
+            }
+
+            // خصم 1 نقطة بدلًا من 60
+            score -= 1;
+            scoreElement.textContent = `النقاط: ${score}`;
+
+            // بقية الكود كما هو...
+            const prizes = [
+                { type: "heart", value: 2, message: "لقد ربحت قلبين إضافيين!", color: "good" },
+                { type: "points", value: 60, message: "لقد ربحت 60 نقطة!", color: "good" },
+                { type: "losePoints", value: 0, message: "لقد خسرت كل النقاط!", color: "bad" },
+                { type: "nothing", value: 0, message: "لم تربح أي شيء!", color: "bad" },
+                { type: "points", value: 100, message: "لقد ربحت 100 نقطة!", color: "good" },
+                { type: "loseHeart", value: 1, message: "لقد خسرت قلبًا واحدًا!", color: "bad" }
+            ];
+
+            const randomIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[randomIndex];
+
+            // تطبيق الجائزة
+            switch (prize.type) {
+                case "heart":
+                    hearts += prize.value;
+                    updateHearts();
+                    break;
+                case "points":
+                    score += prize.value;
+                    scoreElement.textContent = `النقاط: ${score}`;
+                    break;
+                case "losePoints":
+                    score = 0;
+                    scoreElement.textContent = `النقاط: ${score}`;
+                    break;
+                case "loseHeart":
+                    hearts -= prize.value;
+                    updateHearts();
+                    break;
+                default:
+                    break;
+            }
+
+            // عرض نتيجة الجائزة
+            wheelResultElement.textContent = prize.message;
+            wheelResultElement.className = `wheel-result ${prize.color}`;
+        }
+
+        // تحميل التقدم عند بدء اللعبة
+        loadProgress();
+        startScreen.style.display = 'block';
+
+        // تعطيل زر "تحقق" إذا كان حقل الإجابة فارغًا
+        answerInput.addEventListener('input', () => {
+            submitButton.disabled = answerInput.value.trim() === '';
+        });
+    </script>
 </body>
 </html>
